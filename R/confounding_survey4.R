@@ -6,7 +6,7 @@ survey4_analyze <- function(survey_data = "data/confounding_democratic_peace_4_s
                             trade_data = "data/dyadic_trade_3.0.csv"){
   
   # Load the function
-  source("R/survey4_functions.R")
+  #source("R/survey4_functions.R")
   
   # Load in survey data
   # this is data simulated from Qualtric's "test survey" function
