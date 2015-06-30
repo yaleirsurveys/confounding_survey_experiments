@@ -1,14 +1,7 @@
 ######################################
 # DEMOCRATIC PEACE Survey 4 CODE
 
-survey4_analyze <- function(survey_data = "data/confounding_democratic_peace_4_sim.sav",
-                            military_data = "data/NMC_v4_0.csv",
-                            trade_data = "data/dyadic_trade_3.0.csv"){
-  
-  # Load the function
-  #source("R/survey4_functions.R")
-  
-  # Load in survey data
+survey4_analyze <- function(survey_data, military_data, trade_data) {
   # this is data simulated from Qualtric's "test survey" function
   d4 <- read_spss(survey_data)
   d <- d4[d4$workerid != "",] # only completed responses
