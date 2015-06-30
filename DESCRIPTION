@@ -1,0 +1,23 @@
+Package: confounding
+Type: Package
+Title: Confounding in Survey Experiments
+Version: 1.0.0
+Date: 2015-06-30
+Author: Baobao Zhang
+Maintainer: Baobao Zhang <baobao.zhang@yale.edu>
+Description: Code, simulated data, and functions for "Confounding in Survey Experiments". 
+License: MIT + file LICENSE
+Depends:
+    ggplot2,
+    foreign,
+	  xtable,
+	  reshape,
+	  haven,
+	  systemfit,
+	  lfe,
+    pacman,
+    pwr,
+    reshape2,
+    dplyr,
+    magrittr,
+    testthat
