@@ -2,9 +2,11 @@
 # DEMOCRATIC PEACE Survey 4 CODE
 
 survey4_analyze <- function(survey_data, military_data, trade_data) {
+  
   # this is data simulated from Qualtric's "test survey" function
   d4 <- read_spss(survey_data)
   d <- d4[d4$workerid != "",] # only completed responses
+  
   ##########################################3
   # Treatment Assignments Variables
   # Democracy Vignette
