@@ -203,7 +203,7 @@ survey4_analyze <- function(images_directory = NULL, output_print = FALSE) {
                   x.breaks=probint, 
                   x.labels=likelylab,
                   title=levels(d$V)[j], 
-                  xlab="Likelihood of Being Majorit White")
+                  xlab="Likelihood of Being Majority White")
     if (!is.null(images_directory)) {
       ggsave(paste0(images_directory, "/white", j, ".pdf"), width=5, heigh=3.5) 
     } else{

@@ -1,0 +1,13 @@
+---
+title: "Running R Analysis Code"
+author: "Baobao Zhang"
+date: "July 1, 2015"
+output: pdf_document
+---
+
+We knit to show the output of running the analysis code.
+
+```{r}
+library(confounding)
+survey4_analyze(output_print = TRUE)
+```
