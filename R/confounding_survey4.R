@@ -3,9 +3,8 @@
 
 #The primary statement of our analysis plan is in our pre-analysis plan in Open
 #Science Foundation Storage. In this GitHub repo, we have also included
-#partially complete code and simulated data related to our pre-analysis plan in
-#our GitHub repository; the pre-analysis plan supersedes the code in any areas
-#of ambiguity or difference.
+#partially complete code and simulated data related to our pre-analysis plan; 
+#the pre-analysis plan supersedes the code in any areas of ambiguity or difference.
 
 survey4_analyze <- function(images_directory = NULL, output_print = FALSE,
                             return_main = FALSE) {
