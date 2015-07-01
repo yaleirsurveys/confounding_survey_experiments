@@ -7,7 +7,18 @@ output: pdf_document
 
 We knit to show the output of running the analysis code.
 
-```{r}
+```{r setup, include=FALSE}
+library(knitr)
+opts_chunk$set(dev = 'pdf')
+```
+
+```{r, fig.height=3.5}
 library(confounding)
+# return results
 survey4_analyze(output_print = TRUE)
+```
+
+```{r, fig.height=10}
+# return main coefficient plot
+survey4_analyze(output_print = FALSE, return_main = TRUE)
 ```
