@@ -1,12 +1,12 @@
 ######################################
 # DEMOCRATIC PEACE Survey 4 CODE
 
-survey4_analyze <- function(survey_data, military_data, trade_data) {
-  
+survey4_analyze <- function(images_directory = NULL) {
+  # save images by specifying a images directory
   # this is data simulated from Qualtric's "test survey" function
-  d4 <- read_spss(survey_data)
+  d4 <- read_spss(system.file("extdata", "confounding_democratic_peace_4_sim.sav",
+                              package = "confounding"))
   d <- d4[d4$workerid != "",] # only completed responses
-  
   ##########################################3
   # Treatment Assignments Variables
   # Democracy Vignette
@@ -42,9 +42,9 @@ survey4_analyze <- function(survey_data, military_data, trade_data) {
   # standardized
   d$region.s <- vscale(var = d$region, vig = d$V)
   # regression: standardized
-  region.s <- myreg(Y = d$region.s)
+  region.s <- myreg(Y = d$region.s, Z = d$Z, V = d$V)
   # regression: non-standardized
-  region.n <- myreg(Y = d$region)
+  region.n <- myreg(Y = d$region, , Z = d$Z, V = d$V)
   # regression with dummy variables and interactions
   robustse(lm(formula = region ~ Z + V + Z:V, data = d))
   robustse(lm(formula = region.s ~ Z + V + Z:V, data = d))
@@ -54,7 +54,8 @@ survey4_analyze <- function(survey_data, military_data, trade_data) {
   d$gdp <- ifelse(is.na(d$gdp_1), d$gdp_2, d$gdp_1)
   # relabel 
   # real-world median values for each interval
-  qog <- read.dta("data/qog_bas_ts_jan15.dta")
+  qog <- read.dta(system.file("extdata", "qog_bas_ts_jan15.dta",
+                              package = "confounding"))
   r_gdp <- qog$gle_cgdpc[qog$year==2005]
   d$gdp <- relab(old.var = d$gdp, old.labs = 1:7, 
                  new.labs = c(median(r_gdp[r_gdp < 500], TRUE), 
@@ -68,20 +69,23 @@ survey4_analyze <- function(survey_data, military_data, trade_data) {
   d$gdp.s <- vscale(var = d$gdp, vig = d$V)
   # graphing distribution
   for (j in 1:3){
-    test <- myden(Y=d$gdp, v = j, x.limits=c(0, 60000), 
+    my_ggplot <- myden(Y=d$gdp, V=d$V, Z=d$Z, v = j, x.limits=c(0, 60000), 
                   x.breaks=seq(0,60000,10000), 
                   x.labels=seq(0,60000,10000),
                   title=levels(d$V)[j], xlab="GDP per Capita (USD)")
- 
-    ggsave(paste("images/gdp",j,".pdf",sep = ""), width=5, heigh=3.5)
+    if (!is.null(images_directory)) {
+      ggsave(paste0(images_directory, "/gdp", j, ".pdf"), width=5, heigh=3.5) 
+    } else{
+      print(my_ggplot)
+    }
   }
   # regression: standardized 
-  gdp.s <- myreg(Y = d$gdp.s)
+  gdp.s <- myreg(Y = d$gdp.s, Z = d$Z, V = d$V)
   # regression: non-standardized
-  gdp.n <- myreg(Y = d$gdp)
+  gdp.n <- myreg(Y = d$gdp, Z = d$Z, V = d$V)
   # regression with dummy variables and interactions
-  robustse(lm(formula = gdp ~ Z + V + Z:V, data = d))
-  robustse(lm(formula = gdp.s ~ Z + V + Z:V, data = d))
+  gdp.1 <- robustse(lm(formula = gdp ~ Z + V + Z:V, data = d))
+  gdp.2 <- robustse(lm(formula = gdp.s ~ Z + V + Z:V, data = d))
   
   ############################################
   # Placebo Test E: Religion
@@ -96,21 +100,24 @@ survey4_analyze <- function(survey_data, military_data, trade_data) {
   d$religion.s <- vscale(var = d$religion, vig = d$V)
   # graphing distribution
   for (j in 1:3){
-    test <- myden(Y=d$religion, v = j, x.limits=c(0, 100), 
+    my_ggplot <- myden(Y=d$religion, V=d$V, Z=d$Z, v = j, x.limits=c(0, 100), 
                   x.breaks=probint, 
                   x.labels=likelylab,
                   title=levels(d$V)[j], 
                   xlab="Likelihood of Being Majority Christian")
- 
-    ggsave(paste("images/religion",j,".pdf",sep = ""), width=5, heigh=3.5)
+    if (!is.null(images_directory)) {
+      ggsave(paste0(images_directory, "/religion", j, ".pdf"), width=5, heigh=3.5) 
+    } else{
+      print(my_ggplot)
+    }
   }
   # regression: standardized 
-  religion.s <- myreg(Y = d$religion.s)
+  religion.s <- myreg(Y = d$religion.s, Z = d$Z, V = d$V)
   # regression: non-standardized
-  religion.n <- myreg(Y = d$religion)
+  religion.n <- myreg(Y = d$religion, Z = d$Z, V = d$V)
   # regression with dummy variables and interactions
-  robustse(lm(formula = religion ~ Z + V + Z:V, data = d))
-  robustse(lm(formula = religion.s ~ Z + V + Z:V, data = d))
+  religion.1 <- robustse(lm(formula = religion ~ Z + V + Z:V, data = d))
+  religion.2 <- robustse(lm(formula = religion.s ~ Z + V + Z:V, data = d))
   
   ############################################
   # Placebo Test F: Oil Reserves
@@ -125,21 +132,24 @@ survey4_analyze <- function(survey_data, military_data, trade_data) {
   d$oil.s <- vscale(var = d$oil.o, vig = d$V)
   # graphing distribution
   for (j in 1:3){
-    test <- myden(Y=d$oil, v = j, x.limits=c(0, 100), 
+    my_ggplot <- myden(Y=d$oil, V=d$V, Z=d$Z, v = j, x.limits=c(0, 100), 
                   x.breaks=probint, 
                   x.labels=likelylab,
                   title=levels(d$V)[j], 
                   xlab="Likelihood of Having Large Oil Reserves")
- 
-    ggsave(paste("images/oil",j,".pdf",sep = ""), width=5, heigh=3.5)
+    if (!is.null(images_directory)) {
+      ggsave(paste0(images_directory, "/oil", j, ".pdf"), width=5, heigh=3.5) 
+    } else{
+      print(my_ggplot)
+    }
   }
   # regression: standardized 
-  oil.s <- myreg(Y = d$oil.s)
+  oil.s <- myreg(Y = d$oil.s, Z = d$Z, V = d$V)
   # regression: non-standardized
-  oil.n <- myreg(Y = d$oil)
+  oil.n <- myreg(Y = d$oil, Z = d$Z, V = d$V)
   # regression with dummy variables and interactions
-  robustse(lm(formula = oil ~ Z + V + Z:V, data = d))
-  robustse(lm(formula = oil.s ~ Z + V + Z:V, data = d))
+  oil.1 <- robustse(lm(formula = oil ~ Z + V + Z:V, data = d))
+  oil.2 <- robustse(lm(formula = oil.s ~ Z + V + Z:V, data = d))
   
   ############################################
   # Placebo Test G: White
@@ -154,28 +164,32 @@ survey4_analyze <- function(survey_data, military_data, trade_data) {
   d$white.s <- vscale(var = d$white, vig = d$V)
   # graphing distribution
   for (j in 1:3){
-    test <- myden(Y=d$white, v = j, x.limits=c(0, 100), 
+    my_ggplot <- myden(Y=d$white, V=d$V, Z=d$Z, v = j, x.limits=c(0, 100), 
                   x.breaks=probint, 
                   x.labels=likelylab,
                   title=levels(d$V)[j], 
                   xlab="Likelihood of Being Majorit White")
- 
-    ggsave(paste("images/white",j,".pdf",sep = ""), width=5, heigh=3.5)
+    if (!is.null(images_directory)) {
+      ggsave(paste0(images_directory, "/white", j, ".pdf"), width=5, heigh=3.5) 
+    } else{
+      print(my_ggplot)
+    }
   }
   # regression: standardized 
-  white.s <- myreg(Y = d$white.s)
+  white.s <- myreg(Y = d$white.s, Z = d$Z, V = d$V)
   # regression: non-standardized
-  white.n <- myreg(Y = d$white)
+  white.n <- myreg(Y = d$white, Z = d$Z, V = d$V)
   # regression with dummy variables and interactions
-  robustse(lm(formula = white ~ Z + V + Z:V, data = d))
-  robustse(lm(formula = white.s ~ Z + V + Z:V, data = d))
+  white.1 <- robustse(lm(formula = white ~ Z + V + Z:V, data = d))
+  white.2 <- robustse(lm(formula = white.s ~ Z + V + Z:V, data = d))
   
   ############################################
   # Placebo Test H: Military Capability
   d$force <- ifelse(is.na(d$force_1), d$force_2, d$force_1)
   # relabel 
   # real-world median values in each interval
-  nmc <- read.csv(military_data)
+  nmc <- read.csv(system.file("extdata", "NMC_v4_0.csv",
+                              package = "confounding"))
   r_exp <- nmc$milex[nmc$year == 2005]/1000
   d$force <- relab(old.var = d$force, old.labs = 1:5, 
                    new.labs = c(median(r_exp[r_exp >= 0 & r_exp <= 30], TRUE),
@@ -190,21 +204,24 @@ survey4_analyze <- function(survey_data, military_data, trade_data) {
   d$force.s <- vscale(var = d$force, vig = d$V)
   # graphing distribution
   for (j in 1:3){
-    test <- myden(Y=log(d$force), v = j,
+    my_ggplot <- myden(Y=log(d$force), V=d$V, Z=d$Z, v = j,
                   title=levels(d$V)[j], 
                   xlab="Spending on Military (Log Millions USD)")
- 
-    ggsave(paste("images/force",j,".pdf",sep = ""), width=5, heigh=3.5)
+    if (!is.null(images_directory)) {
+      ggsave(paste0(images_directory, "/force", j, ".pdf"), width=5, heigh=3.5) 
+    } else{
+      print(my_ggplot)
+    }
   }
   # regression: standardized 
-  force.s <- myreg(Y = d$force.s)
+  force.s <- myreg(Y = d$force.s, Z = d$Z, V = d$V)
   # regression: non-standardized
-  force.n <- myreg(Y = d$force)
+  force.n <- myreg(Y = d$force, Z = d$Z, V = d$V)
   # regression: ordinal coding
-  force.o <- myreg(Y = d$force.o)
+  force.o <- myreg(Y = d$force.o, Z = d$Z, V = d$V)
   # regression with dummy variables and interactions
-  robustse(lm(formula = force ~ Z + V + Z:V, data = d))
-  robustse(lm(formula = force.s ~ Z + V + Z:V, data = d))
+  force.1 <- robustse(lm(formula = force ~ Z + V + Z:V, data = d))
+  force.2 <- robustse(lm(formula = force.s ~ Z + V + Z:V, data = d))
   
   ############################################
   # Placebo Test I: Military Alliance
@@ -216,28 +233,32 @@ survey4_analyze <- function(survey_data, military_data, trade_data) {
   d$allies.s <- vscale(var = d$allies, vig = d$V)
   # graphing distribution
   for (j in 1:3){
-    test <- myden(Y=d$allies, v = j, x.limits=c(0, 100), 
+    my_ggplot <- myden(Y=d$allies, V=d$V, Z=d$Z, v = j, x.limits=c(0, 100), 
                   x.breaks=probint, 
                   x.labels=likelylab,
                   title=levels(d$V)[j], 
                   xlab="Likelihood of Military Alliance with the U.S")
- 
-    ggsave(paste("images/allies",j,".pdf",sep = ""), width=5, heigh=3.5)
+    if (!is.null(images_directory)) {
+      ggsave(paste0(images_directory, "/allies", j, ".pdf"), width=5, heigh=3.5) 
+    } else{
+      print(my_ggplot)
+    }
   }
   # regression: standardized 
-  allies.s <- myreg(Y = d$allies.s)
+  allies.s <- myreg(Y = d$allies.s, Z = d$Z, V = d$V)
   # regression: non-standardized
-  allies.n <- myreg(Y = d$allies)
+  allies.n <- myreg(Y = d$allies, Z = d$Z, V = d$V)
   # regression with dummy variables and interactions
-  robustse(lm(formula = allies ~ Z + V + Z:V, data = d))
-  robustse(lm(formula = allies.s ~ Z + V + Z:V, data = d))
+  allies.1 <- robustse(lm(formula = allies ~ Z + V + Z:V, data = d))
+  allies.2 <- robustse(lm(formula = allies.s ~ Z + V + Z:V, data = d))
   
   ############################################
   # Placebo Test J: Trade with the U.S.
   d$trade <- ifelse(is.na(d$trade_1), d$trade_2, d$trade_1)
   # relabel 
   # get real-world median values for each interval
-  cow_trade <- read.csv(trade_data)
+  cow_trade <- read.csv(system.file("extdata", "dyadic_trade_3.0.csv",
+                                    package = "confounding"))
   cow_trade <- cow_trade[cow_trade$importer1=="United States of America" & 
                            cow_trade$year==2005,]
   r_trade <- cow_trade$flow1 + cow_trade$flow2
@@ -254,21 +275,24 @@ survey4_analyze <- function(survey_data, military_data, trade_data) {
   d$trade.s <- vscale(var = d$trade, vig = d$V)
   # graphing distribution
   for (j in 1:3){
-    test <- myden(Y=log(d$trade), v = j,
+    my_ggplot <- myden(Y=log(d$trade), V=d$V, Z=d$Z, v = j,
                   title=levels(d$V)[j], 
                   xlab="Total Trade Flow (Log Millions USD)")
- 
-    ggsave(paste("images/trade",j,".pdf",sep = ""), width=5, heigh=3.5)
+    if (!is.null(images_directory)) {
+      ggsave(paste0(images_directory, "/trade", j, ".pdf"), width=5, heigh=3.5) 
+    } else{
+      print(my_ggplot)
+    }
   }
   # regression: standardized 
-  trade.s <- myreg(Y = d$trade.s)
+  trade.s <- myreg(Y = d$trade.s, Z = d$Z, V = d$V)
   # regression: non-standardized
-  trade.n <- myreg(Y = d$trade)
+  trade.n <- myreg(Y = d$trade, Z = d$Z, V = d$V)
   # regression: ordinal coding
-  trade.o <- myreg(Y = d$trade.o)
+  trade.o <- myreg(Y = d$trade.o, Z = d$Z, V = d$V)
   # regression with dummy variables and interactions
-  robustse(lm(formula = trade ~ Z + V + Z:V, data = d))
-  robustse(lm(formula = trade.s ~ Z + V + Z:V, data = d))
+  trade.1 <- robustse(lm(formula = trade ~ Z + V + Z:V, data = d))
+  trade.2 <- robustse(lm(formula = trade.s ~ Z + V + Z:V, data = d))
   
   ############################################
   # Placebo Test K: Joint Military Exercise
@@ -280,21 +304,24 @@ survey4_analyze <- function(survey_data, military_data, trade_data) {
   d$exercise.s <- vscale(var = d$exercise, vig = d$V)
   # graphing distribution
   for (j in 1:3){
-    test <- myden(Y=d$exercise, v = j, x.limits=c(0, 100), 
+    my_ggplot <- myden(Y=d$exercise, V=d$V, Z=d$Z, v = j, x.limits=c(0, 100), 
                   x.breaks=probint, 
                   x.labels=likelylab,
                   title=levels(d$V)[j], 
                   xlab="Likelihood of Joint Military Exercise with U.S.")
- 
-    ggsave(paste("images/exercise",j,".pdf",sep = ""), width=5, heigh=3.5)
+    if (!is.null(images_directory)) {
+      ggsave(paste0(images_directory, "/exercise", j, ".pdf"), width=5, heigh=3.5) 
+    } else{
+      print(my_ggplot)
+    }
   }
   # regression: standardized 
-  exercise.s <- myreg(Y = d$exercise.s)
+  exercise.s <- myreg(Y = d$exercise.s, Z = d$Z, V = d$V)
   # regression: non-standardized
-  exercise.n <- myreg(Y = d$exercise)
+  exercise.n <- myreg(Y = d$exercise, Z = d$Z, V = d$V)
   # regression with dummy variables and interactions
-  robustse(lm(formula = exercise ~ Z + V + Z:V, data = d))
-  robustse(lm(formula = exercise.s ~ Z + V + Z:V, data = d))
+  exercise.1 <- robustse(lm(formula = exercise ~ Z + V + Z:V, data = d))
+  exercise.2 <- robustse(lm(formula = exercise.s ~ Z + V + Z:V, data = d))
   
   ############################################
   # Placebo Test L: Foreign Direct Investment
@@ -307,21 +334,24 @@ survey4_analyze <- function(survey_data, military_data, trade_data) {
   d$invest.s <- vscale(var = d$invest, vig = d$V)
   # graphing distribution
   for (j in 1:3){
-    test <- myden(Y=d$invest, v = j, x.limits=c(0, 6), 
+    my_ggplot <- myden(Y=d$invest, V=d$V, Z=d$Z, v = j, x.limits=c(0, 6), 
                   x.breaks=1:5, 
                   x.labels=sizelab,
                   title=levels(d$V)[j], 
                   xlab="Level of Investment in U.S. Businesses")
- 
-    ggsave(paste("images/invest",j,".pdf",sep = ""), width=5, heigh=3.5)
+    if (!is.null(images_directory)) {
+      ggsave(paste0(images_directory, "/invest", j, ".pdf"), width=5, heigh=3.5) 
+    } else{
+      print(my_ggplot)
+    }
   }
   # regression: standardized 
-  invest.s <- myreg(Y = d$invest.s)
+  invest.s <- myreg(Y = d$invest.s, Z = d$Z, V = d$V)
   # regression: non-standardized
-  invest.n <- myreg(Y = d$invest)
+  invest.n <- myreg(Y = d$invest, Z = d$Z, V = d$V)
   # regression with dummy variables and interactions
-  robustse(lm(formula = invest ~ Z + V + Z:V, data = d))
-  robustse(lm(formula = invest.s ~ Z + V + Z:V, data = d))
+  invest.1 <- robustse(lm(formula = invest ~ Z + V + Z:V, data = d))
+  invest.2 <- robustse(lm(formula = invest.s ~ Z + V + Z:V, data = d))
   
   #######################################
   # Make Coefficient Plot
@@ -359,11 +389,16 @@ survey4_analyze <- function(survey_data, military_data, trade_data) {
     scale_color_manual(name="Vignette Type",
                        values=c("firebrick3","forestgreen","dodgerblue3"))+
     scale_shape_manual(name="Vignette Type",values=c(21,22,23))
-  f + facet_wrap( ~ placebo, ncol=1)+
+  my_ggplot <- f + facet_wrap( ~ placebo, ncol=1)+
     theme_bbtop()+
     xlab("Standardized Difference (Dem-NonDem)")+
     ylab("")+scale_y_discrete(breaks=NULL)
-  ggsave("images/coef_plot_main_s.pdf", height=7, width=5.5,dpi = 600)
+  if (!is.null(images_directory)) {
+    ggsave(paste0(images_directory, "/coef_plot_main_s", ".pdf"), 
+           height=7, width=5.5,dpi = 600)
+  } else{
+    print(my_ggplot)
+  }
   
   #######################################
   # Seemingly Unrelated Regression
@@ -433,18 +468,18 @@ survey4_analyze <- function(survey_data, military_data, trade_data) {
   d$R2 <- psum(d$demchar_1, d$demchar_4, d$demchar_5, d$demchar_6,
                d$demchar_7, d$demchar_8, na.rm=F)
   # regression
-  R2 <- myreg(Y = d$R2)
+  R2 <- myreg(Y = d$R2, Z = d$Z, V = d$V)
   
   ###############################
   # ITT estimate of democracy on support for military action
   d$support <- ifelse(is.na(d$support_1), d$support_2-1, d$support_1-1)
   # coding #1: set "don't know" to NA
   d$support[d$support>4] <- NA
-  support <- myreg(Y = d$support)
+  support <- myreg(Y = d$support, Z = d$Z, V = d$V)
   # coding #2: set "don't know" to 2
   d$support2 <- d$support
   d$support2[is.na(d$support2)] <- 2
-  support2 <- myreg(Y = d$support2)
+  support2 <- myreg(Y = d$support2, Z = d$Z, V = d$V)
   ###############################
   # IV estimate of democracy on support for military action
   # using coding 1 for support
