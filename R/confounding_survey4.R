@@ -1,9 +1,12 @@
 ######################################
 # DEMOCRATIC PEACE Survey 4 CODE
 
-survey4_analyze <- function(images_directory = NULL) {
+survey4_analyze <- function(images_directory = NULL, output_print = FALSE) {
   # save images by specifying a images directory
   # this is data simulated from Qualtric's "test survey" function
+  if (output_print){
+    print(paste0("Complied Date and Time: ", Sys.time()))
+  }
   d4 <- read_spss(system.file("extdata", "confounding_democratic_peace_4_sim.sav",
                               package = "confounding"))
   d <- d4[d4$workerid != "",] # only completed responses
@@ -27,6 +30,10 @@ survey4_analyze <- function(images_directory = NULL) {
   # make a factor for d$V
   d$V <- factor(x = d$V, labels = c("Basic", "Controlled Details", "ENE"))
   d <- d[!is.na(d$V),]
+  # size of data set
+  if (output_print){
+    dim(d)
+  }
   
   ############################################
   # Placebo Test C: Regions of the World
@@ -46,8 +53,15 @@ survey4_analyze <- function(images_directory = NULL) {
   # regression: non-standardized
   region.n <- myreg(Y = d$region, , Z = d$Z, V = d$V)
   # regression with dummy variables and interactions
-  robustse(lm(formula = region ~ Z + V + Z:V, data = d))
-  robustse(lm(formula = region.s ~ Z + V + Z:V, data = d))
+  region.1 <- robustse(lm(formula = region ~ Z + V + Z:V, data = d))
+  region.2 <- robustse(lm(formula = region.s ~ Z + V + Z:V, data = d))
+  if (output_print){
+    print("Placebo Test C: Regions of the World")
+    print(region.s)
+    print(region.n)
+    print(region.1)
+    print(region.2)
+  }
   
   ############################################
   # Placebo Test D: GDP per Capita
@@ -86,6 +100,13 @@ survey4_analyze <- function(images_directory = NULL) {
   # regression with dummy variables and interactions
   gdp.1 <- robustse(lm(formula = gdp ~ Z + V + Z:V, data = d))
   gdp.2 <- robustse(lm(formula = gdp.s ~ Z + V + Z:V, data = d))
+  if (output_print){
+    print("Placebo Test D: GDP per Capita")
+    print(gdp.s)
+    print(gdp.n)
+    print(gdp.1)
+    print(gdp.2)
+  }
   
   ############################################
   # Placebo Test E: Religion
@@ -118,6 +139,13 @@ survey4_analyze <- function(images_directory = NULL) {
   # regression with dummy variables and interactions
   religion.1 <- robustse(lm(formula = religion ~ Z + V + Z:V, data = d))
   religion.2 <- robustse(lm(formula = religion.s ~ Z + V + Z:V, data = d))
+  if (output_print){
+    print("Placebo Test E: Religion")
+    print(religion.s)
+    print(religion.n)
+    print(religion.1)
+    print(religion.2)
+  }
   
   ############################################
   # Placebo Test F: Oil Reserves
@@ -150,6 +178,13 @@ survey4_analyze <- function(images_directory = NULL) {
   # regression with dummy variables and interactions
   oil.1 <- robustse(lm(formula = oil ~ Z + V + Z:V, data = d))
   oil.2 <- robustse(lm(formula = oil.s ~ Z + V + Z:V, data = d))
+  if (output_print){
+    print("Placebo Test F: Oil Reserves")
+    print(oil.s)
+    print(oil.n)
+    print(oil.1)
+    print(oil.2)
+  }
   
   ############################################
   # Placebo Test G: White
@@ -182,6 +217,13 @@ survey4_analyze <- function(images_directory = NULL) {
   # regression with dummy variables and interactions
   white.1 <- robustse(lm(formula = white ~ Z + V + Z:V, data = d))
   white.2 <- robustse(lm(formula = white.s ~ Z + V + Z:V, data = d))
+  if (output_print){
+    print("Placebo Test G: White")
+    print(white.s)
+    print(white.n)
+    print(white.1)
+    print(white.2)
+  }
   
   ############################################
   # Placebo Test H: Military Capability
@@ -222,6 +264,13 @@ survey4_analyze <- function(images_directory = NULL) {
   # regression with dummy variables and interactions
   force.1 <- robustse(lm(formula = force ~ Z + V + Z:V, data = d))
   force.2 <- robustse(lm(formula = force.s ~ Z + V + Z:V, data = d))
+  if (output_print){
+    print("Placebo Test H: Military Capability")
+    print(force.s)
+    print(force.n)
+    print(force.1)
+    print(force.2)
+  }
   
   ############################################
   # Placebo Test I: Military Alliance
@@ -251,6 +300,13 @@ survey4_analyze <- function(images_directory = NULL) {
   # regression with dummy variables and interactions
   allies.1 <- robustse(lm(formula = allies ~ Z + V + Z:V, data = d))
   allies.2 <- robustse(lm(formula = allies.s ~ Z + V + Z:V, data = d))
+  if (output_print){
+    print("Placebo Test I: Military Alliance")
+    print(allies.s)
+    print(allies.n)
+    print(allies.1)
+    print(allies.2)
+  }
   
   ############################################
   # Placebo Test J: Trade with the U.S.
@@ -293,6 +349,13 @@ survey4_analyze <- function(images_directory = NULL) {
   # regression with dummy variables and interactions
   trade.1 <- robustse(lm(formula = trade ~ Z + V + Z:V, data = d))
   trade.2 <- robustse(lm(formula = trade.s ~ Z + V + Z:V, data = d))
+  if (output_print){
+    print("Placebo Test J: Trade with the U.S.")
+    print(trade.s)
+    print(trade.n)
+    print(trade.1)
+    print(trade.2)
+  }
   
   ############################################
   # Placebo Test K: Joint Military Exercise
@@ -322,6 +385,13 @@ survey4_analyze <- function(images_directory = NULL) {
   # regression with dummy variables and interactions
   exercise.1 <- robustse(lm(formula = exercise ~ Z + V + Z:V, data = d))
   exercise.2 <- robustse(lm(formula = exercise.s ~ Z + V + Z:V, data = d))
+  if (output_print){
+    print("Placebo Test K: Joint Military Exercise")
+    print(exercise.s)
+    print(exercise.n)
+    print(exercise.1)
+    print(exercise.2)
+  }
   
   ############################################
   # Placebo Test L: Foreign Direct Investment
@@ -352,6 +422,13 @@ survey4_analyze <- function(images_directory = NULL) {
   # regression with dummy variables and interactions
   invest.1 <- robustse(lm(formula = invest ~ Z + V + Z:V, data = d))
   invest.2 <- robustse(lm(formula = invest.s ~ Z + V + Z:V, data = d))
+  if (output_print){
+    print("Placebo Test L: Foreign Direct Investment")
+    print(invest.s)
+    print(invest.n)
+    print(invest.1)
+    print(invest.2)
+  }
   
   #######################################
   # Make Coefficient Plot
@@ -424,10 +501,12 @@ survey4_analyze <- function(images_directory = NULL) {
                      "r.i_ZDemocracy = 0", "r.j_ZDemocracy = 0",
                      "r.k_ZDemocracy = 0", "r.l_ZDemocracy = 0")
     # joint tests
-    linearHypothesis(fitsur, restriction, 
+    joint <- linearHypothesis(fitsur, restriction, 
                            test = "Chisq", white.adjust = TRUE)  
-    linearHypothesis(fitsur, restriction, 
-                           test = "F", white.adjust = TRUE)
+    if (output_print){
+      print("Joint Test")
+      print(joint)
+    }
   }
   
   #######################################
@@ -470,6 +549,12 @@ survey4_analyze <- function(images_directory = NULL) {
   # regression
   R2 <- myreg(Y = d$R2, Z = d$Z, V = d$V)
   
+  if (output_print){
+    print("Treatment Measures")
+    print(R1)
+    print(R2)
+  }
+  
   ###############################
   # ITT estimate of democracy on support for military action
   d$support <- ifelse(is.na(d$support_1), d$support_2-1, d$support_1-1)
@@ -493,6 +578,12 @@ survey4_analyze <- function(images_directory = NULL) {
            Z = d$Z[!is.na(d$support2)], 
            V = d$V[!is.na(d$support2)])
   
+  if (output_print){
+    print("IV")
+    print(iv.res1)
+    print(iv.res2)
+  }
+  
   ############################################
   # Balance Tests
   
@@ -504,14 +595,23 @@ survey4_analyze <- function(images_directory = NULL) {
   
   # balance tests
   for (i in 1:3){
-    robustse(lm(as.numeric(Z)-1 ~ college, data = d[d$V==levels(d$V)[i],]))
-    robustse(lm(as.numeric(Z)-1 ~ democrat, data = d[d$V==levels(d$V)[i],]))
-    robustse(lm(as.numeric(Z)-1 ~ age_num, data = d[d$V==levels(d$V)[i],]))
-    robustse(lm(as.numeric(Z)-1 ~ male, data = d[d$V==levels(d$V)[i],]))
-    robustse(lm(as.numeric(Z)-1 ~ poliid_1, data = d[d$V==levels(d$V)[i],]))  
+    b1 <- robustse(lm(as.numeric(Z)-1 ~ college, data = d[d$V==levels(d$V)[i],]))
+    b2 <- robustse(lm(as.numeric(Z)-1 ~ democrat, data = d[d$V==levels(d$V)[i],]))
+    b3 <- robustse(lm(as.numeric(Z)-1 ~ age_num, data = d[d$V==levels(d$V)[i],]))
+    b4 <- robustse(lm(as.numeric(Z)-1 ~ male, data = d[d$V==levels(d$V)[i],]))
+    b5 <- robustse(lm(as.numeric(Z)-1 ~ poliid_1, data = d[d$V==levels(d$V)[i],]))  
     overall <- felm(as.numeric(Z)-1 ~ college + democrat + age_num +
                       male + poliid_1, data = d[d$V==levels(d$V)[i],])
-    summary(object = overall, robust = TRUE)
+    b_overall <- summary(object = overall, robust = TRUE)
+    if (output_print){
+      print("Balance Tests")
+      print(b1)
+      print(b2)
+      print(b3)
+      print(b4)
+      print(b5)
+      print(b_overall)
+    }
   }  
   
   return("All the code ran without error.")
